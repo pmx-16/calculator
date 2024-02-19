@@ -1,8 +1,11 @@
 """Display the calculator user interface."""
 from calculator_ui import CalculatorUI
-
+from calculator_model import CalculatorModel
+from calculator_controller import CalculatorController
 
 if __name__ == '__main__':
-    # create the UI.  There is no controller (yet), so nothing to inject.
-    ui = CalculatorUI()
-    ui.run()
+    model = CalculatorModel()
+    view = CalculatorUI()
+    controller = CalculatorController(model, view)
+    view.model = model
+    view.mainloop()

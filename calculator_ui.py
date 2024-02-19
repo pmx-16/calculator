@@ -1,4 +1,5 @@
 import tkinter as tk
+from tkinter import ttk
 from keypad import Keypad
 
 class CalculatorUI(tk.Tk):
@@ -63,16 +64,25 @@ class CalculatorUI(tk.Tk):
         self.display = tk.Entry(self, textvariable=self.display_value,
                                 justify='right', state='readonly', font=('Arial', 24))
         self.display.grid(row=0, column=0, columnspan=4, sticky=tk.EW, padx=10, pady=10)
-  
+
+        # Add history listbox
+        self.history_listbox = tk.Listbox(self, height=1)
+        self.history_listbox.grid(row=1, column=0, columnspan=4, sticky="nsew", padx=5, pady=5)
+
+        # Add combobox for extra mathematical operations
+        self.math_operations = ttk.Combobox(self, values=["exp", "ln", "log", "log2", "sqrt"])
+        self.math_operations.grid(row=2, column=0, columnspan=4, sticky="ew", padx=5, pady=5)
+        self.math_operations.bind("<<ComboboxSelected>>")
+
         # Create keypad
-        numeric_keys = list('789456123 0.')  # Number keys
+        numeric_keys = list('789456123C0.')  # Number keys
         self.numeric_keypad = Keypad(self, keynames=numeric_keys, columns=3)
-        self.numeric_keypad.grid(row=1, column=0, sticky=tk.NSEW, padx=0, pady=0)
+        self.numeric_keypad.grid(row=3, column=0, sticky=tk.NSEW, padx=0, pady=0)
 
         # Create operator pad
         operator_keys = list('/*-+^=')  # Operator keys
         self.operator_keypad = Keypad(self, keynames=operator_keys, columns=1)
-        self.operator_keypad.grid(row=1, column=3, sticky=tk.NSEW, padx=0, pady=0)
+        self.operator_keypad.grid(row=3, column=3, sticky=tk.NSEW, padx=0, pady=0)
 
         # Bind events and configure styles for all keys
         self.numeric_keypad.bind("<Button-1>", self.key_pressed)
@@ -85,6 +95,30 @@ class CalculatorUI(tk.Tk):
         self.rowconfigure(1, weight=1)
         self.columnconfigure(0, weight=3)
         self.columnconfigure(3, weight=1)
+
+    def load_history(self, event):
+        selection = event.widget.curselection()
+        if selection:
+            index = selection[0]
+            selected_text = event.widget.get(index)
+            expression = selected_text.split(' = ')[0]
+            self.display_value.set(expression)
+
+    def set_key_press_callback(self, callback):
+        self.key_press_callback = callback
+
+    def on_button_press(self, value):
+        if self.key_press_callback:
+            self.key_press_callback(value)
+
+    def display_error(self, message):
+        self.display_value.set(message)
+        self.display.config(fg='red')
+
+    def update_history_view(self):
+        self.history_listbox.delete(0, tk.END)
+        for entry in self.model.get_history():
+            self.history_listbox.insert(tk.END, entry)
 
     def run(self):
         self.mainloop()
