@@ -8,4 +8,4 @@ if __name__ == '__main__':
     view = CalculatorUI()
     controller = CalculatorController(model, view)
     view.model = model
-    view.mainloop()
+    view.run()
