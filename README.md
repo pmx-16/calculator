@@ -36,4 +36,5 @@ keypad.bind("<Button-1>", key_handler)
 ```
 
 This code should bind *all* the keys to the same event handler.
-
+## UML class diagram
+![uml class diagram](calculator.jpg)
